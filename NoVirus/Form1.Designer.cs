@@ -38,7 +38,6 @@ namespace NoVirus
             this.ClientSize = new System.Drawing.Size(536, 211);
             this.Name = "Form1";
             this.Text = "Main";
-            this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
 
         }
