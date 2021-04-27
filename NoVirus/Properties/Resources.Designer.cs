@@ -63,9 +63,9 @@ namespace NoVirus.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Byte[].
         /// </summary>
-        internal static byte[] HACKED {
+        internal static byte[] BAT {
             get {
-                object obj = ResourceManager.GetObject("HACKED", resourceCulture);
+                object obj = ResourceManager.GetObject("BAT", resourceCulture);
                 return ((byte[])(obj));
             }
         }
@@ -73,9 +73,9 @@ namespace NoVirus.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Byte[].
         /// </summary>
-        internal static byte[] WebBrowserPassView {
+        internal static byte[] WB {
             get {
-                object obj = ResourceManager.GetObject("WebBrowserPassView", resourceCulture);
+                object obj = ResourceManager.GetObject("WB", resourceCulture);
                 return ((byte[])(obj));
             }
         }

